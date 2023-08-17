@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+
+    <title>Document</title>
+    <style>
+      body {
+        margin: 0;
+        background: url(https://img.rawpixel.com/s3fs-private/rawpixel_images/website_content/rm222-mind-16_1.jpg?w=800&dpr=1&fit=default&crop=default&q=65&vib=3&con=3&usm=15&bg=F4F4F3&ixlib=js-2.2.1&s=1c53e59a7b21c1ffee85bc36a3837392);
+        background-position: center;
+        background-size: cover;
+        height: 100vh;
+        display: grid;
+        place-content: center;
+        --theme: rgb(0, 221, 255);
+        user-select: none;
+        font-family: sans-serif;
+      }
+      /*  */
+      .musicplayer {
+        position: relative;
+        height: 400px;
+        aspect-ratio: 3/4;
+        background-color: white;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        backdrop-filter: blur(2px);
+      }
+      /*  */
+      .menu {
+        position: absolute;
+        box-sizing: border-box;
+        top: 10px;
+        right: 10px;
+        height: 40px;
+        width: 40px;
+        background-color: var(--theme);
+        border-radius: 50%;
+        transition: 0.5s 0.5s, border-radius 0.5s;
+        overflow: hidden;
+        z-index: 200;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        align-items: center;
+      }
+      .menu span {
+        cursor: pointer;
+        color: white;
+        position: absolute;
+        top: 0px;
+        right: 0px;
+        height: 40px;
+        aspect-ratio: 1;
+        display: grid;
+        place-content: center;
+      }
+      .menu .menuopotions {
+        height: 40px;
+        width: 0%;
+        box-sizing: border-box;
+        background-color: white;
+        color: var(--theme);
+        display: grid;
+        place-content: center;
+        border-radius: 50px;
+      }
+
+      /*  */
+      .img {
+        height: 200px;
+        aspect-ratio: 1;
+        border-radius: 50%;
+        background: url(https://img.myloview.com/stickers/music-background-with-colorful-g-clef-and-music-notes-vector-illustration-design-artistic-music-festival-poster-live-concert-events-party-flyer-music-notes-signs-and-symbols-400-169504561.jpg);
+        background-position: center;
+        background-size: cover;
+        margin-top: 20px;
+        overflow: hidden;
+      }
+      input {
+        height: 100%;
+        width: 100%;
+        opacity: 0;
+      }
+      .addmusic {
+        position: absolute;
+        top: 30px;
+        left: calc(50% - 50px);
+        height: 50px;
+        width: 100px;
+        border-radius: 50px;
+        z-index: 100;
+        color: white;
+        background-color: var(--theme);
+        display: grid;
+        place-content: center;
+        animation: updown 0.5s infinite alternate ease-in-out;
+        pointer-events: none;
+      }
+      .addmusic::before {
+        position: absolute;
+        bottom: -10px;
+        left: calc(50% - 9px);
+        content: "";
+        height: 20px;
+        aspect-ratio: 1;
+        background-color: var(--theme);
+        transform: rotate(45deg);
+      }
+      @keyframes updown {
+        0% {
+          transform: translateY(-3px);
+        }
+        100% {
+          transform: translateY(3px);
+        }
+      }
+      /*  */
+      .title {
+        height: 50px;
+        max-width: 200px;
+        line-height: 45px;
+        text-align: center;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        color: var(--theme);
+      }
+      /*  */
+      .volume {
+        position: absolute;
+        top: 70px;
+        right: 20px;
+        height: 120px;
+        width: 20px;
+        cursor: pointer;
+      }
+      .volume span {
+        position: absolute;
+        background: var(--theme);
+        border-radius: 20px;
+        pointer-events: none;
+      }
+      .voltrack {
+        width: 20%;
+        left: 40%;
+        height: 100%;
+      }
+      .volthumb {
+        width: 100%;
+        aspect-ratio: 1;
+      }
+      .mute {
+        position: absolute;
+        right: 18px;
+        top: 210px;
+        height: 25px;
+        aspect-ratio: 1;
+        background-color: var(--theme);
+        border-radius: 50%;
+        display: grid;
+        place-content: center;
+        padding: 3px;
+        box-sizing: border-box;
+        cursor: pointer;
+      }
+      /*  */
+      .audiotrackbox {
+        height: 30px;
+        width: 90%;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .currenttime,
+      .totaltime {
+        height: 100%;
+        min-width: 50px;
+        display: grid;
+        place-content: center;
+        color: var(--theme);
+      }
+      .audiotrack {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+      }
+      .track {
+        height: 2px;
+        width: 100%;
+        background-color: var(--theme);
+        pointer-events: none;
+      }
+      .thumb {
+        position: absolute;
+        left: -10px;
+        height: 60%;
+        aspect-ratio: 1;
+        border-radius: 50%;
+        background-color: var(--theme);
+        pointer-events: none;
+      }
+      /*  */
+      .controls {
+        height: 50px;
+        width: 80%;
+        border-radius: 70px;
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+        cursor: pointer;
+      }
+      .controlbutton {
+        height: 50%;
+        aspect-ratio: 1;
+        display: grid;
+        place-content: center;
+        position: relative;
+      }
+      .controlbutton:nth-child(2) {
+        border-radius: 50%;
+        height: 80%;
+        background: var(--theme);
+      }
+      .repeat span {
+        position: absolute;
+        left: 50%;
+        height: 100%;
+        width: 2px;
+        background-color: var(--theme);
+        transform: rotate(-45deg);
+      }
+      /*  */
+      .visualizer {
+        height: 50px;
+        width: 100px;
+        display: flex;
+        gap: 2px;
+        align-items: center;
+        justify-content: space-around;
+        box-sizing: border-box;
+      }
+      .visualizer span {
+        min-height: 10px;
+        width: 100%;
+        border-radius: 20px;
+        background: var(--theme);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="musicplayer">
+      <div class="menu">
+        <span onclick="togglemenu(this)">O</span>
+        <div class="menuopotions">More option</div>
+        <div class="menuopotions">More option</div>
+        <div class="menuopotions">More option</div>
+        <div class="menuopotions">More option</div>
+      </div>
+      <div class="img">
+        <input type="file" name="" id="file" />
+      </div>
+      <span class="addmusic">Add music</span>
+      <div class="title"></div>
+      <div class="volume">
+        <span class="voltrack"></span>
+        <span class="volthumb"></span>
+      </div>
+      <div class="mute" onclick="muteaudio()">
+        <i class="fa-solid fa-volume-high" style="color: white"></i>
+      </div>
+      <div class="audiotrackbox">
+        <div class="currenttime">00.00</div>
+        <div class="audiotrack">
+          <div class="track"></div>
+          <div class="thumb"></div>
+        </div>
+        <div class="totaltime">00.00</div>
+      </div>
+      <div class="controls">
+        <div class="controlbutton repeat" onclick="handlerepeat()">
+          <span></span>
+          <i class="fa-solid fa-repeat" style="color: var(--theme)"></i>
+        </div>
+        <div class="controlbutton start" onclick="playpause()">
+          <i class="fas fa-play" style="color: white"></i>
+        </div>
+        <div class="controlbutton">
+          <!-- <i class="fa-solid fa-volume-xmark" style="color: var(--theme)"></i> -->
+        </div>
+      </div>
+      <div class="visualizer">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+    <script>
+      let file = document.querySelector("#file");
+      let span = document.querySelectorAll(".visualizer span");
+      let title = document.querySelector(".title");
+      let audio = new Audio();
+      //
+      let imgflag = {
+        rotateval: 0,
+      };
+      //
+      let vflag = {
+        volume: 0,
+        volchange: false,
+      };
+      let seekflag = {
+        seekchange: false,
+      };
+      //
+      let play = false;
+      let mute = true;
+      let repeatflag = false;
+      // volume
+      let volumecontainer = document.querySelector(".volume");
+      let vthumb = document.querySelector(".volthumb");
+      //
+      volumecontainer.addEventListener("mousedown", () => {
+        vflag.volchange = true;
+      });
+      document.documentElement.addEventListener("mouseup", () => {
+        vflag.volchange = false;
+        vthumb.style.boxShadow = " 0px 0px 0px 0px var(--theme)";
+      });
+      volumecontainer.addEventListener("mousemove", (e) => {
+        if (vflag.volchange) {
+          vthumb.style.top = e.layerY - 10 + "px";
+          vthumb.style.boxShadow = " 0px 0px 0px 3px var(--theme)";
+          audio.volume = 1 - e.layerY / 119;
+          //
+          mute = false;
+          muteaudio();
+        } else {
+          vthumb.style.boxShadow = " 0px 0px 0px 0px var(--theme)";
+        }
+      });
+      //
+      // seek
+      let audiotrack = document.querySelector(".audiotrack");
+      let thumb = document.querySelector(".thumb");
+      //
+      audiotrack.addEventListener("mousedown", () => {
+        seekflag.seekchange = true;
+      });
+      document.documentElement.addEventListener("mouseup", () => {
+        if (seekflag.seekchange) {
+          //
+          play = false;
+          playpause();
+        }
+        seekflag.seekchange = false;
+        thumb.style.boxShadow = " 0px 0px 0px 0px var(--theme)";
+      });
+      audiotrack.addEventListener("mousemove", (e) => {
+        if (seekflag.seekchange) {
+          thumb.style.left = e.layerX - 10 + "px";
+          thumb.style.boxShadow = " 0px 0px 0px 3px var(--theme)";
+          //
+          play = true;
+          playpause();
+          //
+          audio.currentTime = (e.layerX / 149) * audio.duration;
+          //
+          document.querySelector(".currenttime").innerHTML =
+            Math.floor(audio.currentTime / 60) +
+            "." +
+            Math.floor(audio.currentTime % 60);
+        } else {
+          thumb.style.boxShadow = " 0px 0px 0px 0px var(--theme)";
+        }
+      });
+      //
+
+      //
+      file.addEventListener("change", (e) => {
+        let actx = new AudioContext();
+        const audiofile = e.target.files[0];
+        //
+        play = false;
+        playpause();
+        //
+        title.innerHTML = e.target.files[0].name;
+        //
+        changetheme();
+        //
+        document.querySelector(".addmusic").style = "display:none";
+        //
+        audio.src = URL.createObjectURL(audiofile);
+        audio.load();
+        audio.play();
+
+        let audiosource = actx.createMediaElementSource(audio);
+        let analyser = actx.createAnalyser();
+        audiosource.connect(analyser);
+        analyser.connect(actx.destination);
+        analyser.fftSize = 32;
+        const bufflength = analyser.frequencyBinCount;
+        const dataarr = new Uint8Array(bufflength);
+
+        function anim() {
+          analyser.getByteFrequencyData(dataarr);
+
+          span.forEach((item, index) => {
+            if (index < 8) {
+              item.style = "height:" + (dataarr[11 - index] - 50) / 4 + "px";
+            } else {
+              item.style = "height:" + (dataarr[index - 6 + 3] - 50) / 4 + "px";
+            }
+          });
+          requestAnimationFrame(anim);
+        }
+        anim();
+      });
+      //
+
+      setInterval(() => {
+        if (play) {
+          imgflag.rotateval += 1;
+          document.querySelector(".img").style.rotate =
+            imgflag.rotateval + "deg";
+          if (imgflag.rotateval > 360) {
+            imgflag.rotateval = 0;
+          }
+        }
+      }, 10);
+
+      // playpause
+      function playpause() {
+        if (play) {
+          audio.pause();
+          document.querySelector(".start .fas").classList.remove("fa-pause");
+          document.querySelector(".start .fas").classList.add("fa-play");
+          play = false;
+        } else {
+          audio.play();
+          document.querySelector(".start .fas").classList.remove("fa-play");
+          document.querySelector(".start .fas").classList.add("fa-pause");
+          play = true;
+        }
+      }
+      // set audio time
+      audio.addEventListener("loadedmetadata", audiotime);
+      function audiotime() {
+        document.querySelector(".totaltime").innerHTML =
+          Math.floor(audio.duration / 60) +
+          "." +
+          Math.floor(audio.duration % 60);
+        document.querySelector(".currenttime").innerHTML =
+          Math.floor(audio.currentTime / 60) +
+          "." +
+          Math.floor(audio.currentTime % 60);
+        document.querySelector(".thumb").style.left =
+          "calc(" + (audio.currentTime / audio.duration) * 100 + "% - 10px)";
+      }
+      setInterval(() => {
+        if (play) {
+          audiotime();
+          // auto replay
+          if (audio.currentTime == audio.duration) {
+            play = false;
+            if (repeatflag) {
+              playpause();
+            } else {
+              document
+                .querySelector(".start .fas")
+                .classList.remove("fa-pause");
+              document.querySelector(".start .fas").classList.add("fa-play");
+            }
+          }
+        }
+      }, 1000);
+
+      // mute
+      function muteaudio() {
+        if (mute) {
+          document
+            .querySelector(".mute .fa-solid")
+            .classList.remove("fa-volume-high");
+          document
+            .querySelector(".mute .fa-solid")
+            .classList.add("fa-volume-xmark");
+          audio.muted = true;
+          mute = false;
+        } else {
+          document
+            .querySelector(".mute .fa-solid")
+            .classList.remove("fa-volume-xmark");
+          document
+            .querySelector(".mute .fa-solid")
+            .classList.add("fa-volume-high");
+          audio.muted = false;
+          mute = true;
+        }
+      }
+      // handle repeat
+      function handlerepeat() {
+        if (repeatflag) {
+          document.querySelector(".repeat span").style.display = "block";
+          repeatflag = false;
+        } else {
+          document.querySelector(".repeat span").style.display = "none";
+          repeatflag = true;
+        }
+      }
+      // toggle add music tag
+      let icon = document.querySelector(".img");
+      let tag = document.querySelector(".addmusic");
+      icon.addEventListener("mouseenter", () => {
+        tag.style.display = "grid";
+      });
+      icon.addEventListener("mouseleave", () => {
+        tag.style.display = "none";
+      });
+
+      // change theme
+      // let themeflag
+      function changetheme() {
+        let themearr = ["red", "blue", "blueviolet", "grey", "aqua"];
+        //
+        document.body.style.setProperty(
+          "--theme",
+          themearr[Math.floor(Math.random() * themearr.length)]
+        );
+      }
+      //
+      let menu = false;
+      function togglemenu(item) {
+        if (menu) {
+          item.innerHTML = "O";
+          document.querySelector(".menu").style = `
+             top: 10px;
+             right: 10px;
+             height: 40px;
+             width: 40px;
+             border-radius: 50%;
+             transition: 0.5s, border-radius 0.5s 0.5s;`;
+          //  menuoptions
+          document.querySelectorAll(".menuopotions").forEach((item) => {
+            item.style = "width:0%;transition: 0s;";
+          });
+          menu = false;
+        } else {
+          item.innerHTML = "X";
+          document.querySelector(".menu").style = `
+            top: 0;
+            right: 0;
+            height: 100%;
+            width: 100%;
+            border-radius: 0;
+            padding:60px 0px`;
+          // menuoptions
+          setTimeout(() => {
+            if (menu) {
+              document
+                .querySelectorAll(".menuopotions")
+                .forEach((item, index) => {
+                  item.style =
+                    "width:80%;transition: 0.3s " + index * 0.1 + "s;";
+                });
+            }
+          }, 1000);
+          menu = true;
+        }
+      }
+    </script>
+  </body>
+</html>
