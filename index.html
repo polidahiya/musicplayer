@@ -342,34 +342,54 @@
       let volumecontainer = document.querySelector(".volume");
       let vthumb = document.querySelector(".volthumb");
       //
-      volumecontainer.addEventListener("mousedown", () => {
+      function volstart() {
         vflag.volchange = true;
-      });
-      document.documentElement.addEventListener("mouseup", () => {
+      }
+      function volend() {
         vflag.volchange = false;
         vthumb.style.boxShadow = " 0px 0px 0px 0px var(--theme)";
-      });
-      volumecontainer.addEventListener("mousemove", (e) => {
+      }
+      function volmove(e) {
         if (vflag.volchange) {
-          vthumb.style.top = e.layerY - 10 + "px";
+          let rect = volumecontainer.getBoundingClientRect();
           vthumb.style.boxShadow = " 0px 0px 0px 3px var(--theme)";
-          audio.volume = 1 - e.layerY / 119;
+          if (e.touches) {
+            if (
+              e.touches[0].clientY - rect.y < rect.height &&
+              e.touches[0].clientY - rect.y > 0
+            ) {
+              vthumb.style.top = e.touches[0].clientY - rect.y - 10 + "px";
+              audio.volume =
+                1 - Math.floor(e.touches[0].clientY - rect.y) / rect.height;
+            }
+          } else {
+            if (e.clientY - rect.y < rect.height && e.clientY - rect.y > 0) {
+              vthumb.style.top = e.clientY - rect.y - 10 + "px";
+              audio.volume = 1 - Math.floor(e.clientY - rect.y) / rect.height;
+            }
+          }
           //
           mute = false;
           muteaudio();
         } else {
           vthumb.style.boxShadow = " 0px 0px 0px 0px var(--theme)";
         }
-      });
+      }
+      volumecontainer.addEventListener("mousedown", volstart);
+      volumecontainer.addEventListener("touchstart", volstart);
+      document.documentElement.addEventListener("mouseup", volend);
+      document.documentElement.addEventListener("touchend", volend);
+      volumecontainer.addEventListener("mousemove", volmove);
+      volumecontainer.addEventListener("touchmove", volmove);
       //
       // seek
       let audiotrack = document.querySelector(".audiotrack");
       let thumb = document.querySelector(".thumb");
       //
-      audiotrack.addEventListener("mousedown", () => {
+      function seekstart() {
         seekflag.seekchange = true;
-      });
-      document.documentElement.addEventListener("mouseup", () => {
+      }
+      function seekend() {
         if (seekflag.seekchange) {
           //
           play = false;
@@ -377,16 +397,35 @@
         }
         seekflag.seekchange = false;
         thumb.style.boxShadow = " 0px 0px 0px 0px var(--theme)";
-      });
-      audiotrack.addEventListener("mousemove", (e) => {
+      }
+      function seekmove(e) {
         if (seekflag.seekchange) {
-          thumb.style.left = e.layerX - 10 + "px";
+          let rect = audiotrack.getBoundingClientRect();
           thumb.style.boxShadow = " 0px 0px 0px 3px var(--theme)";
           //
           play = true;
           playpause();
           //
-          audio.currentTime = (e.layerX / 149) * audio.duration;
+          if (e.touches) {
+            if (
+              e.touches[0].clientX - rect.left > 0 &&
+              e.touches[0].clientX - rect.left < rect.width
+            ) {
+              thumb.style.left = e.touches[0].clientX - rect.left - 10 + "px";
+              audio.currentTime =
+                ((e.touches[0].clientX - rect.left) / rect.width) *
+                audio.duration;
+            }
+          } else {
+            if (
+              e.clientX - rect.left > 0 &&
+              e.clientX - rect.left < rect.width
+            ) {
+              thumb.style.left = e.clientX - rect.left - 10 + "px";
+              audio.currentTime =
+                ((e.clientX - rect.left) / rect.width) * audio.duration;
+            }
+          }
           //
           document.querySelector(".currenttime").innerHTML =
             Math.floor(audio.currentTime / 60) +
@@ -395,10 +434,17 @@
         } else {
           thumb.style.boxShadow = " 0px 0px 0px 0px var(--theme)";
         }
-      });
+      }
+      //
+      audiotrack.addEventListener("mousedown", seekstart);
+      audiotrack.addEventListener("touchstart", seekstart);
+      document.documentElement.addEventListener("mouseup", seekend);
+      document.documentElement.addEventListener("touchend", seekend);
+      audiotrack.addEventListener("mousemove", seekmove);
+      audiotrack.addEventListener("touchmove", seekmove);
       //
 
-      //
+      // visualizer
       file.addEventListener("change", (e) => {
         let actx = new AudioContext();
         const audiofile = e.target.files[0];
